@@ -325,7 +325,6 @@ app.get("/supplierA/hotels", (_req: Request, res: Response) => {
   res.json(cityData[cityStr] || []);
 });
 
-// ── Mock Supplier B ───────────────────────────────────────────────────────────
 app.get("/supplierB/hotels", (_req: Request, res: Response) => {
   const { city } = _req.query;
   const cityStr = (city as string)?.toLowerCase().trim();
@@ -778,7 +777,6 @@ app.get("/api/hotels", async (req: Request, res: Response) => {
   }
 });
 
-// ── Start ─────────────────────────────────────────────────────────────────────
 app
   .listen(config.port, () =>
     console.log(`[Server] Running on http://localhost:${config.port}`),
