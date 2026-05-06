@@ -1,0 +1,26 @@
+{
+  "name": "hotel-offer-orchestrator",
+  "version": "1.0.0",
+  "scripts": {
+    "start:server": "ts-node src/server.ts",
+    "start:worker": "ts-node src/worker.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@temporalio/activity": "^1.11.0",
+    "@temporalio/client": "^1.11.0",
+    "@temporalio/worker": "^1.11.0",
+    "@temporalio/workflow": "^1.11.0",
+    "axios": "^1.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.0",
+    "redis": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}

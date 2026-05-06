@@ -1,0 +1,58 @@
+{
+  "info": {
+    "name": "Hotel Offer Orchestrator",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": { "method": "GET", "url": "http://localhost:3000/health" }
+    },
+    {
+      "name": "Get All Hotels (Delhi) — 1st call triggers workflow",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=delhi"
+      }
+    },
+    {
+      "name": "Get All Hotels (Delhi) — 2nd call hits Redis cache",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=delhi"
+      }
+    },
+    {
+      "name": "Filter by Min Price 5000",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=5000"
+      }
+    },
+    {
+      "name": "Filter by Max Price 8000",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=delhi&maxPrice=8000"
+      }
+    },
+    {
+      "name": "Filter by Price Range 5000–9000",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=5000&maxPrice=9000"
+      }
+    },
+    {
+      "name": "City with No Results",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=moon"
+      }
+    },
+    {
+      "name": "Missing City — expect 400",
+      "request": { "method": "GET", "url": "http://localhost:3000/api/hotels" }
+    }
+  ]
+}
