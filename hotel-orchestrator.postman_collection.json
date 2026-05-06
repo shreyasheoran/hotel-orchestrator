@@ -6,53 +6,342 @@
   "item": [
     {
       "name": "Health Check",
-      "request": { "method": "GET", "url": "http://localhost:3000/health" }
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Service is healthy\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.service).to.eql(\"healthy\");",
+              "});",
+              "",
+              "pm.test(\"Suppliers are up\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.supplierA).to.eql(\"up\");",
+              "    pm.expect(jsonData.supplierB).to.eql(\"up\");",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Get All Hotels (Delhi) — 1st call triggers workflow",
       "request": {
         "method": "GET",
         "url": "http://localhost:3000/api/hotels?city=delhi"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Hotels have required fields\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.length > 0) {",
+              "        var hotel = jsonData[0];",
+              "        pm.expect(hotel).to.have.property('name');",
+              "        pm.expect(hotel).to.have.property('price');",
+              "        pm.expect(hotel).to.have.property('supplier');",
+              "        pm.expect(hotel).to.have.property('commissionPct');",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Get All Hotels (Delhi) — 2nd call hits Redis cache",
       "request": {
         "method": "GET",
         "url": "http://localhost:3000/api/hotels?city=delhi"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Filter by Min Price 5000",
       "request": {
         "method": "GET",
         "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=5000"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All prices >= 5000\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(hotel) {",
+              "        pm.expect(hotel.price).to.be.at.least(5000);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Filter by Max Price 8000",
       "request": {
         "method": "GET",
         "url": "http://localhost:3000/api/hotels?city=delhi&maxPrice=8000"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All prices <= 8000\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(hotel) {",
+              "        pm.expect(hotel.price).to.be.at.most(8000);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Filter by Price Range 5000–9000",
       "request": {
         "method": "GET",
         "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=5000&maxPrice=9000"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All prices in range 5000-9000\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(hotel) {",
+              "        pm.expect(hotel.price).to.be.at.least(5000);",
+              "        pm.expect(hotel.price).to.be.at.most(9000);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "City with No Results",
       "request": {
         "method": "GET",
         "url": "http://localhost:3000/api/hotels?city=moon"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is empty array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array').that.is.empty;",
+              "});"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Missing City — expect 400",
-      "request": { "method": "GET", "url": "http://localhost:3000/api/hotels" }
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Error message present\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid Price Parameter — expect 400",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test(\"Error message present\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Supplier A Direct (for testing supplier down)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/supplierA/hotels?city=delhi"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns hotel array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Different Cities",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=mumbai"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Another City - Bangalore",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=bangalore"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Price Filtering on Mumbai",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/hotels?city=mumbai&minPrice=20000&maxPrice=30000"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All prices in range 20000-30000\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(function(hotel) {",
+              "        pm.expect(hotel.price).to.be.at.least(20000);",
+              "        pm.expect(hotel.price).to.be.at.most(30000);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

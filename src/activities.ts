@@ -1,9 +1,9 @@
 import axios from "axios";
 import { createClient } from "redis";
+import { config } from "./config";
 
-const BASE_URL = process.env.API_URL || "http://localhost:3000";
+const BASE_URL = config.apiUrl;
 
-// ✅ FIX: Don't connect at module load — use a lazy getter that awaits the connection.
 let redisClient: ReturnType<typeof createClient> | null = null;
 
 async function getRedisClient() {
@@ -16,7 +16,7 @@ async function getRedisClient() {
       console.error("[Redis] Client error:", err.message),
     );
 
-    await redisClient.connect(); // properly awaited — throws if Redis is down
+    await redisClient.connect();
     console.log("[Redis] Connected successfully.");
   }
   return redisClient;
@@ -58,7 +58,7 @@ export async function saveToRedis(city: string, hotels: any[]): Promise<void> {
       value: JSON.stringify(hotel),
     });
   }
-  multi.expire(`hotels:${city}`, 300); // 5-minute TTL
+  multi.expire(`hotels:${city}`, config.redisTtlSeconds); // Configurable TTL
   await multi.exec();
   console.log(`[Activity] Saved to Redis. Key=hotels:${city}, TTL=300s`);
 }

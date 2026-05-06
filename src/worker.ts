@@ -1,5 +1,6 @@
 import { Worker, NativeConnection } from "@temporalio/worker";
 import * as activities from "./activities";
+import { config } from "./config";
 
 async function bootWorker() {
   const MAX_RETRIES = 15;
@@ -12,7 +13,7 @@ async function bootWorker() {
         `[Worker] Connecting to Temporal (attempt ${attempt}/${MAX_RETRIES})...`,
       );
       connection = await NativeConnection.connect({
-        address: process.env.TEMPORAL_ADDRESS || "localhost:7233",
+        address: config.temporalAddress,
       });
       console.log("[Worker] Connected to Temporal.");
       break;
@@ -37,9 +38,9 @@ async function bootWorker() {
       connection,
       workflowsPath: require.resolve("./workflows"),
       activities,
-      taskQueue: "hotel-queue",
+      taskQueue: config.temporalTaskQueue,
     });
-    console.log("[Worker] Listening on queue: hotel-queue");
+    console.log(`[Worker] Listening on queue: ${config.temporalTaskQueue}`);
     await worker.run();
   } catch (err: any) {
     console.error("[Worker] FATAL: Crashed at runtime.", err.message);

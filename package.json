@@ -1,6 +1,10 @@
 {
   "name": "hotel-offer-orchestrator",
   "version": "1.0.0",
+  "main": "dist/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start:server": "ts-node src/server.ts",
     "start:worker": "ts-node src/worker.ts",
